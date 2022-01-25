@@ -29,21 +29,82 @@
     //   tags: Array,
     //   comments: Array,
     // }
+    
+    const myId = 2
 
     // Q1: 自分のブログで最もlikeCountの多いもののtitleは？
 
+    const getUserById = Id => users.filter(el => el.id === Id)
+
+    const targetUser = getUserById(myId)
+
+    const mostLikeCount = targetUser[0].blogs.reduce((acc,value) => acc < value.likeCount ? value.likeCount : acc ,0)
+    
+    const mostLike = targetUser[0].blogs.filter(el => el.likeCount === mostLikeCount)
+ 
+    mostLike.forEach(el => console.log(el.title))
+
     // Q2: 自分のブログで非公開になっているものの中の最大のlikeCountは？そのタイトルは？
 
+    const isClose = (value) => !value.publish
+
+    const mostLikeCountClose = targetUser[0].blogs.reduce((acc, value) =>  {
+      return isClose(value) && acc < value.likeCount ? value.likeCount : acc;
+    }, 0)
+
+    const mostLikeClose = targetUser[0].blogs.filter(el => el.likeCount === mostLikeCountClose)
+
+    mostLikeClose.forEach(el => console.log(el.title))
     // Q3: 自分のブログの公開率は？
+
+    const getUserBlogById = Id => users.filter(el => el.id === Id)[0].blogs
+    const userBlogs = getUserBlogById(myId)
+    const userOpenBlog = userBlogs.filter(el => el.publish ===true)
+    const openBlogCount = userOpenBlog.length
+    const totalBlogCount = userBlogs.length
+    const openRate = openBlogCount/totalBlogCount
+    console.log(openRate)
 
     // Q4: 自分のブログに最もついているタグは？、その個数は？
 
+    const tagArray = userBlogs.flatMap(el => el.tags)
+    console.log(tagArray)
+    const tagObject = tagArray.reduce((acc,tag) => {
+      acc?.[tag] ? acc[tag]++ : acc[tag] = 1
+      return acc
+    },{})
+    const maxCount = Object.values(tagObject).reduce((prev,current) => prev < current ? current : prev)
+    const maxTags = Object.keys(tagObject).filter(el => tagObject[el] ===maxCount)
+    //const openRate = openBlogCount / totalBlogCount
+    console.log("タグ："+maxTags + "個数："+maxCount)
+
+  
+
     // Q5: 全てのブログの中で最もLikeCountの多いもののタイトルは？
+    const getAllBlogs = () => users.map(user => user.blogs).flat()
+    const getMostLiked = blogs => blogs.reduce((acc, cor) => acc.likeCount < cor.likeCount ? cor : acc)
+    const getTitle = (blog) => blog.title 
+    const allBlogs = getAllBlogs()
+    const mostLikedBlog = getMostLiked(allBlogs)
+    const mostLikedTitle =  getTitle(mostLikedBlog)
+    console.log(mostLikedTitle)
 
     // Q6: 全てのブログの中で最もLikeCountの多いもののユーザー名は？
+    //const totalLikeCount = users.map(user => user.blogs.reduce((a, b) => a + b.likeCount, 0))
+    //const mostLikedElement = allRate.reduce((acc, cor, index) => users[index])
+    //console.log(mostLikedElement)
 
     // Q7: 最もLike率の高いユーザーは？
-
+    const totalLikeCount = users.map(user => user.blogs.reduce((a, b) => a + b.likeCount, 0))
+    const totalBlogLength = users.map(user => user.blogs.length)
+    const allRate = totalLikeCount.map((el,elIndex) => el/totalBlogLength[elIndex])
+    const mostLikedElement = allRate.reduce((acc,cor,index) => users[index])
+    console.log(mostLikedElement.name)
+    //   const totalLikeCount = user.blogs.reduce((a, b) => a + b.likeCount, 0)
+    //   const totalBlogLength = user.blogs.length
+    //   user.likeRate = totalLikeCount / totalBlogLength
+    //   return user
+    // })
 
 
   </script>

@@ -41,11 +41,11 @@
       console.log(hogeUser)
 
     // Q6: usersのデータからmailに.fooが含まれないデータだけ取得する
-      const notefooUser = users.filter(el => el.email.indexOf('foo') === -1)
+      const notefooUser = users.filter(el => el.email.indexOf('.foo') === -1)
       console.log(notefooUser)
 
     // Q7: usersのデータにidが7の物があるかないか調べる
-      const id7User = users.filter(el => el.id === '7').length > 0 ? false : true  
+      const id7User = users.filter(el => el.id === 7).length > 0 ? true : false  
       
       console.log(id7User)
 
@@ -76,7 +76,7 @@
       console.log(idmaxUser)  
     
     // Q11: usersのidで最小の物を取得する
-      const idminUser = users.reduce((a, b) => a < b.id ? a : b.id, Infinity)
+      const idminUser = users.reduce((a, b) => a < b.id ? a : b.id, 100)
 
       console.log(idminUser)  
 
