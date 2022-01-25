@@ -13,6 +13,8 @@
     import { users } from './data/blogs.js'
     console.log(users)
 
+
+
     // user : {
     //   id: Number,
     //   name: String,
@@ -30,21 +32,82 @@
     //   comments: Array,
     // }
 
+
+    const myObj = users.filter(el => el.name === '神ちゃん')[0]
+    //console.log(myObj)
+
+
     // Q1: 自分のブログで最もlikeCountの多いもののtitleは？
+    const getMaxLike = (obj) => {
+      return myObj.blogs.sort((a, b) => b.likeCount - a.likeCount)[0].title
+    }
+    //console.log(getMaxLike(users))
+
 
     // Q2: 自分のブログで非公開になっているものの中の最大のlikeCountは？そのタイトルは？
+    const getUnpublishedPopularTitle = (obj) => {
+      return myObj.blogs.filter(e => e.publish === false).reduce((a, b) => b.likeCount > a ? b : a)
+    }
+    //console.log(getUnpublishedPopularTitle(users))
+
 
     // Q3: 自分のブログの公開率は？
+    const getPublishRate = (obj) => {
+      const publishNum = myObj.blogs.filter(el => el.publish === true).length
+      const blogsNum = myObj.blogs.length
+      return publishNum / blogsNum
+    }
+    //console.log(getPublishRate(users))
 
     // Q4: 自分のブログに最もついているタグは？、その個数は？
+    const getMaxTagBlog = (obj) => {
+      const tagNum = Math.max(...myObj.blogs.map(el => el.tags.length))
+      const tags = myObj.blogs.flatMap(el => el.tags.length >= tagNum ? el.tags : [])
+      return [tagNum, tags]
+    }
+    //console.log(getMaxTagBlog(users))
+
 
     // Q5: 全てのブログの中で最もLikeCountの多いもののタイトルは？
+    const getMostLikeCountBlogTitle = (obj) => {
+      return Math.max(...obj.map(el => Math.max(...el.blogs.map(e => e.likeCount))))
+    }
+    console.log(getMostLikeCountBlogTitle(users))
+
 
     // Q6: 全てのブログの中で最もLikeCountの多いもののユーザー名は？
+    const getMostPopularBloger = (obj, num) => {
+      const tmp = obj.flatMap(el => el.blogs.flatMap(e => e.likeCount === num ? el.name : []))
+      return new Set(tmp)
+    }
+    console.log(getMostPopularBloger(users, getMostLikeCountBlogTitle(users)))
 
     // Q7: 最もLike率の高いユーザーは？
+    //likeの合計値をblog数で割った値？
+    const getHighPopularRateBloger = (obj) => {
+      const likeCountArray = obj.map(el => el.blogs.reduce((a, b) => {
+        return a + b.likeCount
+      }, 0))
+      //console.log(likeCountArray)
 
+      const blogsNumArray = obj.map(el => el.blogs.length)
+      //console.log(blogsNumArray)
 
+      const getLikeRatio = (array1, array2) => {
+        return array1.map((el, i) => el / array2[1])
+      }
+
+      let i = 0
+      getLikeRatio(likeCountArray, blogsNumArray).reduce((a, b) => {
+        if (a > b) {
+          i += 1
+          return a
+        }
+        return b
+      })
+      return users[i].name
+    }
+    console.log(getHighPopularRateBloger(users))
 
   </script>
 </body>
