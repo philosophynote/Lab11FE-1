@@ -71,7 +71,7 @@
 
     const getMostEntries = obj => Object.entries(obj).reduce((a, entry, i) => {
       if(entry[1] > a[0][1]) return [entry]
-      if(entry[1] === a[0][1]) a.concat([entry])
+      if(entry[1] === a[0][1]) return a.concat([entry])
       return a
     }, [[0,0]])
 
@@ -86,16 +86,21 @@
     }, [])
 
     const maxLikeCount = getMaxNumOfProp(allBlogs(), 'likeCount')
-    const getMostLikedBlog = (array) => array.filter(el => el.likeCount === maxLikeCount)
+
+    const getMostLikedBlog = array => array.filter(el => el.likeCount === maxLikeCount)
     const listTitles = array => array.map(el => [el.title, el.author])
+    
+    console.log(allBlogs())
     console.log("A5, A6: ", listTitles(getMostLikedBlog(allBlogs())))
 
     // Q7: 最もLike率の高いユーザーは？
     const getAveLikeCounts = blogs => blogs.reduce((a,blog) => a + blog.likeCount, 0) / blogs.length
+
     const mapAveLikeCnt = () => users.reduce((a,user) => { 
       a[user.name] = getAveLikeCounts(user.blogs)
       return a
     }, {})
+    
     const getMostLikeRatioUser = obj => {
       return Object.entries(obj).reduce((a,b,i) => a[1] >= b[1] ? a : b)
     }
