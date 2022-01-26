@@ -11,7 +11,7 @@
 <body>
   <script type="module">
     import { users } from './data/blogs.js'
-    console.log(users)
+    // console.log(users)
 
     // user : {
     //   id: Number,
@@ -29,86 +29,96 @@
     //   tags: Array,
     //   comments: Array,
     // }
-    const myName = "小玉身師"
+    const myUid = 8
+
     // Q1: 自分のブログで最もlikeCountの多いもののtitleは？
-    const getOnesProp = (name, prop) => users.find(el => el.name === name)[prop]
-    const getMaxNumOfProp = (array, prop) => Math.max(...array.map(el => el[prop]))
-    const getMostIndex = (array, prop) => array.findIndex(el => el[prop] === getMaxNumOfProp(array, prop))
-    const getTitle = (array, num) => array[num].title
-
-    const target = 'blogs'
-    const srchProp = 'likeCount'
-
-    const myBlogs = getOnesProp(myName, target)
-    const mostLikeCountIndex = getMostIndex(myBlogs, srchProp)
-
-    console.log("A1: ", myBlogs[mostLikeCountIndex].title)
-
-    // Q2: 自分のブログで非公開になっているものの中の最大のlikeCountは？そのタイトルは？
-    const getPrivateBlogs = array => array.filter(el=> !el.publish) 
-
-    const myPrivateBlogs = getPrivateBlogs(myBlogs)
-    const mostLikeCountInPrivate = getMaxNumOfProp(myPrivateBlogs, srchProp)
-    const mostLikeCountIdxInPrivate = getMostIndex(myPrivateBlogs, srchProp)
-
-    console.log("A2: ", myPrivateBlogs[mostLikeCountIdxInPrivate].title,mostLikeCountInPrivate)
-
-    // Q3: 自分のブログの公開率は？
-    const publicRatio = (array) => array.reduce((a,b,i) => {
-      const sum = (b.publish ? a + 1 : a)
-      return i === array.length - 1 ? sum / (i + 1) : sum
-    }, 0)
-
-    console.log("A3: ", publicRatio(myBlogs))
-
-    // Q4: 自分のブログに最もついているタグは？、その個数は？
-    const countPropElements = (array, prop) => array.reduce((a,blog,i) => {
-      blog[prop].forEach(el => {
-        !a[el] ? a[el] = 1 : a[el] += 1 
-      })
-      return a
-    }, {})
-
-    const getMostEntries = obj => Object.entries(obj).reduce((a, entry, i) => {
-      if(entry[1] > a[0][1]) return [entry]
-      if(entry[1] === a[0][1]) return a.concat([entry])
-      return a
-    }, [[0,0]])
-
-    console.log(countPropElements(myBlogs, 'tags'))
-    console.log("A4: \n", getMostEntries(countPropElements(myBlogs, 'tags')).join('\n'))
-
-    // Q5: 全てのブログの中で最もLikeCountの多いもののタイトルは？
-    // Q6: 全てのブログの中で最もLikeCountの多いもののユーザー名は？
-
-    const allBlogs = () => users.reduce((a,user) => {
-      return a.concat(user['blogs'].map(el => Object.assign(el, {author:user.name})))
-    }, [])
-
-    const maxLikeCount = getMaxNumOfProp(allBlogs(), 'likeCount')
-
-    const getMostLikedBlog = array => array.filter(el => el.likeCount === maxLikeCount)
-    const listTitles = array => array.map(el => [el.title, el.author])
-    
-    console.log(allBlogs())
-    console.log("A5, A6: ", listTitles(getMostLikedBlog(allBlogs())))
-
-    // Q7: 最もLike率の高いユーザーは？
-    const getAveLikeCounts = blogs => blogs.reduce((a,blog) => a + blog.likeCount, 0) / blogs.length
-
-    const mapAveLikeCnt = () => users.reduce((a,user) => { 
-      a[user.name] = getAveLikeCounts(user.blogs)
-      return a
-    }, {})
-    
-    const getMostLikeRatioUser = obj => {
-      return Object.entries(obj).reduce((a,b,i) => a[1] >= b[1] ? a : b)
+    const getMyMostLikedCountTitle = uid => {
+      return users
+        .find(user => user.id === myUid).blogs
+        .slice()
+        .sort((a,b) => b.likeCount - a.likeCount)[0].title
     }
 
-    // console.log(mapAveLikeCnt())
-    console.log("A7: ", getMostLikeRatioUser(mapAveLikeCnt())[0])
+    console.log("A1")
+    console.log(getMyMostLikedCountTitle(myUid))
 
+    // Q2: 自分のブログで非公開になっているものの中の最大のlikeCountは？そのタイトルは？
+    const getMyMostLikedCountTitleInPrivate = uid => {
+      const mostLikedBlog = users
+        .find(user => user.id === myUid).blogs
+        .filter(blog => !blog.publish)
+        .slice()
+        .sort((a,b) => b.likeCount - a.likeCount)[0] 
+      return [mostLikedBlog.likeCount, mostLikedBlog.title]
+    }
 
+    console.log("A2")
+    console.log(getMyMostLikedCountTitleInPrivate(myUid))
+
+    // Q3: 自分のブログの公開率は？
+    const getMyPublicBlogRatio = uid => {
+      const myBlogs = users.find(user => user.id === myUid).blogs
+      const publicBlogs = myBlogs.filter(blog => blog.publish)
+      return publicBlogs.length / myBlogs.length
+    }
+
+    console.log("A3")
+    console.log(getMyPublicBlogRatio(myUid))
+
+    // Q4: 自分のブログに最もついているタグは？、その個数は？
+    const getTagsAttachedMyBlogs = uid => {
+      return Object.entries(
+        users
+          .find(user => user.id === uid).blogs
+          .reduce((ac,blog) => {
+            blog.tags.forEach(tag => ac[tag] ? ac[tag] += 1 : ac[tag] = 1)
+            return ac
+          }, {})
+      )
+        .sort((a,b) => b[1] - a[1])[0]
+    }
+
+    console.log("A4")
+    console.log(getTagsAttachedMyBlogs(myUid))
+
+    // Q5: 全てのブログの中で最もLikeCountの多いもののタイトルは？
+    const getMostLikedBlogTitle = () => {
+      return users
+        .flatMap(user => user.blogs)
+        .slice()
+        .sort((a,b) => b.likeCount - a.likeCount)[0].title
+    }
+
+    console.log("A5")
+    console.log(getMostLikedBlogTitle())
+
+    // Q6: 全てのブログの中で最もLikeCountの多いもののユーザー名は？
+    const getMostLikedBlogUser = () => {
+      return users
+        .flatMap(user => 
+          user.blogs.map(blog => 
+            Object.assign(blog, {name:user.name, uid:user.id})
+          )
+        )
+        .slice()
+        .sort((a,b) => b.likeCount - a.likeCount)[0].name
+    }
+
+    console.log("A6")
+    console.log(getMostLikedBlogUser())
+    // Q7: 最もLike率の高いユーザーは？
+    const getMostLikedUser = () => {
+      return users
+        .map(user => user.blogs
+          .reduce((ac, blog, i) => {
+            return i === user.blogs.length - 1 ? {name: user.name, likeRatio: ac/user.blogs.length} : ac + blog.likeCount
+          }, 0)
+        )
+        .sort((a,b) => b.likeRatio - a.likeRatio)[0]
+    }
+
+    console.log("A7")
+    console.log(getMostLikedUser())
 
   </script>
 </body>
